@@ -10,7 +10,7 @@
 library(shiny)
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
 
     # Application title
     titlePanel("Laser Icp-Ms Maps"),
@@ -21,16 +21,14 @@ shinyUI(fluidPage(
             fileInput("upload",
                       "Laser Data"),
             
-            checkboxGroupInput("sel_elements", "Select elements", "")
+            checkboxGroupInput("sel_elements", "Select elements")
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
             # if more than 12 elements are selected I should create more plot 
             # Outputs
-            tableOutput("files"),
             plotOutput("LaserMap"),
-            textOutput("elements_all")
         )
     )
 ))
