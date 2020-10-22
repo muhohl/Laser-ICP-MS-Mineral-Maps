@@ -19,14 +19,18 @@ shinyUI(fluidPage(
         sidebarPanel(
             # Uploat data set
             fileInput("upload",
-                      "Laser Data")
+                      "Laser Data"),
+            
+            checkboxGroupInput("sel_elements", "Select elements", "")
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
             # if more than 12 elements are selected I should create more plot 
             # Outputs
-            plotOutput("distPlot")
+            tableOutput("files"),
+            plotOutput("LaserMap"),
+            textOutput("elements_all")
         )
     )
 ))
