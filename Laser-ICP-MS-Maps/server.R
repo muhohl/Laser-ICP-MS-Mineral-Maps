@@ -21,30 +21,34 @@ shinyServer(function(input, output, session) {
         names(laser_data()[-c(1,2)])
     })
     
-     sel_elements <- reactive({
-            input$sel_elements
-        })
+    sel_elements <- reactive({
+        input$sel_elements
+    })
+    
+    clip_element <- reactive({
+        input$clipelement
+    })
+    
+    clip_values <- reactive({
+        laser_data() %>% 
+        dplyr::pull(clip_element())
+    })
      
-     clip_element <- reactive({
-            laser_data() %>% 
-            dplyr::pull(sel_elements()[1])
-            })
-     
-     cliped_data <- reactive({
-         laser_data() %>% 
-             dplyr::filter(!! sym(sel_elements()[1]) > input$clip_slider[1] &
-                           !! sym(sel_elements()[1]) < input$clip_slider[2])
-     })
+    cliped_data <- reactive({
+        laser_data() %>% 
+            dplyr::filter(!! sym(clip_element()) > input$clip_slider[1] &
+                              !! sym(clip_element()) < input$clip_slider[2])
+    })
         
-     my_range <- reactive({
-         cbind(input$clip_slider[1],input$clip_slider[2])
-     })
+    my_range <- reactive({
+        cbind(input$clip_slider[1],input$clip_slider[2])
+    })
          
     output$ClipPlot <- plotly::renderPlotly({
         
-        if (is.null(sel_elements())) return(NULL)
+        if (clip_element() == "") return(NULL)
         
-        geochem::clipping_element(sel_elements()[1],
+        geochem::clipping_element(clip_element(),
                                   cliped_data())
     }) 
      
@@ -53,7 +57,7 @@ shinyServer(function(input, output, session) {
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
         
-        map_plot_list <- geochem::laser_map(data = cliped_data(),
+        map_plot_list <- geochem::laser_map(data = laser_data(),
                                             selected_elements = sel_elements())
 
         ggpubr::ggarrange(plotlist = map_plot_list)
@@ -69,15 +73,23 @@ shinyServer(function(input, output, session) {
                                  choices = elements_all())
     })
     
+   observe({
+       
+       if (is.null(input$upload)) return(NULL)
+       
+       updateSelectInput(session, "clipelement",
+                         choices = elements_all())
+   }) 
+    
     observe({
         
-        if (is.null(sel_elements())) return(NULL)       
+        if (clip_element() == "") return(NULL)       
         
        
         updateSliderInput(session, "clip_slider",
-                          value = c(min(clip_element()), max(clip_element())),
+                          value = c(0, round(max(clip_values()))),
                           min = 0,
-                          max = max(clip_element()))
+                          max = round(max(clip_values())))
         
     })
     

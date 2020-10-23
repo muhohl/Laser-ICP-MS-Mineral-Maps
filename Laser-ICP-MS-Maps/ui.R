@@ -12,40 +12,36 @@ library(shiny)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
 
-    # Application title
-    titlePanel("Laser Icp-Ms Maps"),
-
-    sidebarLayout(
-        sidebarPanel(
-            # Uploat data set
-            fileInput("upload",
-                      "Laser Data"),
-            
-            checkboxGroupInput("sel_elements", "Select elements")
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-            tabsetPanel(
-                tabPanel("Clipping Element",
-                         
-                         plotly::plotlyOutput("ClipPlot"),
-                         
-                         sliderInput("clip_slider", "Clip element", 
-                                     value = c(10, 90),
-                                     min = 1,
-                                     max = 100),
-                         
-                         textOutput("SliderText"),
-                         ),
-                
-                tabPanel("Laser Map",
-                    # if more than 12 elements are selected I should create more plot 
-                    # Outputs
-                    plotOutput("LaserMap")
-                    
-                    )
-                )
-            )
-        )
+    navbarPage("Laser Icp-Ms Maps",
+               tabPanel("Clipping Element",
+                        sidebarLayout(
+                            sidebarPanel(
+                                # Uploat data set
+                                fileInput("upload",
+                                          "Laser Data"),
+                                selectInput("clipelement", "Choose element to clip", 
+                                            choices = "")
+                            ),
+                            
+                            mainPanel(
+                                plotly::plotlyOutput("ClipPlot"),
+                                
+                                sliderInput("clip_slider", "Clip element", 
+                                            value = c(10, 90),
+                                            min = 1,
+                                            max = 100),
+                                
+                                textOutput("SliderText")
+                        ))),
+               tabPanel("Laser Map",
+                        sidebarLayout(
+                            sidebarPanel(
+                                checkboxGroupInput("sel_elements", "Select elements")
+                            ),
+                            
+                            mainPanel(
+                                plotOutput("LaserMap")
+                            )
+                        ))
+               )
     ))
