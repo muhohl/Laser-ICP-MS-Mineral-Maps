@@ -40,8 +40,8 @@ shinyServer(function(input, output, session) {
                               !! sym(clip_element()) < input$clip_slider[2])
     })
         
-    my_range <- reactive({
-        cbind(input$clip_slider[1],input$clip_slider[2])
+    cliped_plot_data <- eventReactive(input$clip, {
+        cliped_data()
     })
          
     output$ClipPlot <- plotly::renderPlotly({
@@ -52,16 +52,27 @@ shinyServer(function(input, output, session) {
                                   cliped_data())
     }) 
      
-    output$LaserMap <- renderPlot(height = 500,{ # 500 seems ok so far
+    output$LaserMap <- renderPlot(height = "auto",{ # 500 seems ok so far
          
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
         
-        map_plot_list <- geochem::laser_map(data = laser_data(),
-                                            selected_elements = sel_elements())
+        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
+                                            selected_elements = sel_elements(),
+                                            option = input$color)
 
         ggpubr::ggarrange(plotlist = map_plot_list)
     })
+    
+    output$download <- downloadHandler(
+        filename = function() {
+            paste0(input$upload, ".png")
+        },
+        
+        content = function(file) {
+            ggplot2::ggsave(file, device = "png", width = 10, height = 15)
+        }
+    )
     
     output$SliderText <- renderText({paste(my_range(), sel_elements())})
     
@@ -96,8 +107,9 @@ shinyServer(function(input, output, session) {
 })
 
 # Works pretty well so far!!
-# TODO Clip the element (slider, plotly (could might be pretty wicked))
-# TODO Option for color scale.
+# TODO Downloading looks like shit. Make the height and width a setting to 
+# define in the app so the user can play around with those values until the plot
+# looks good enough.
 # TODO Option for not log transforming the plot. Maybe in a second tab,
 # because otherwise the list will be very long. Or try to split the 
 # sidebar panel in two columns.
@@ -105,7 +117,6 @@ shinyServer(function(input, output, session) {
 # this involves a lot a of trying and than writing if statements. OR!!
 # Make buttons that let you increase or decrease the plot size manually
 # 
-# TODO Show only selected elements
 # TODO If more than 10? elements are selected make an action button 
 # appear which needs to be pressed to render the plot, because the 
 # plotting slows down quiet a lot with more elements and every selection

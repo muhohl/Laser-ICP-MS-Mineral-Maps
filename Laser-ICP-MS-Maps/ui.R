@@ -20,7 +20,8 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                 fileInput("upload",
                                           "Laser Data"),
                                 selectInput("clipelement", "Choose element to clip", 
-                                            choices = "")
+                                            choices = ""),
+                                actionButton("clip", "Clip your data!"),
                             ),
                             
                             mainPanel(
@@ -29,18 +30,23 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                 sliderInput("clip_slider", "Clip element", 
                                             value = c(10, 90),
                                             min = 1,
-                                            max = 100),
-                                
-                                textOutput("SliderText")
+                                            max = 100)
                         ))),
                tabPanel("Laser Map",
                         sidebarLayout(
                             sidebarPanel(
+                                radioButtons("color", "Choose a color palette",
+                                             choices = c("magma", "inferno", 
+                                                         "plasma", "viridis", 
+                                                         "cividis"),
+                                             selected = "viridis"
+                                            ),
                                 checkboxGroupInput("sel_elements", "Select elements")
                             ),
                             
                             mainPanel(
-                                plotOutput("LaserMap")
+                                plotOutput("LaserMap"),
+                                downloadButton("download")
                             )
                         ))
                )
