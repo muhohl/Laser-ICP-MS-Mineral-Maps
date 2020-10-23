@@ -25,16 +25,41 @@ shinyServer(function(input, output, session) {
             input$sel_elements
         })
      
+     clip_element <- reactive({
+            laser_data() %>% 
+            dplyr::pull(sel_elements()[1])
+            })
+     
+     cliped_data <- reactive({
+         laser_data() %>% 
+             dplyr::filter(!! sym(sel_elements()[1]) > input$clip_slider[1] &
+                           !! sym(sel_elements()[1]) < input$clip_slider[2])
+     })
+        
+     my_range <- reactive({
+         cbind(input$clip_slider[1],input$clip_slider[2])
+     })
+         
+    output$ClipPlot <- plotly::renderPlotly({
+        
+        if (is.null(sel_elements())) return(NULL)
+        
+        geochem::clipping_element(sel_elements()[1],
+                                  cliped_data())
+    }) 
+     
     output$LaserMap <- renderPlot(height = 500,{ # 500 seems ok so far
          
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
         
-        map_plot_list <- geochem::laser_map(data = laser_data(),
+        map_plot_list <- geochem::laser_map(data = cliped_data(),
                                             selected_elements = sel_elements())
 
         ggpubr::ggarrange(plotlist = map_plot_list)
     })
+    
+    output$SliderText <- renderText({paste(my_range(), sel_elements())})
     
     observe({
         
@@ -42,6 +67,17 @@ shinyServer(function(input, output, session) {
         
         updateCheckboxGroupInput(session, "sel_elements",
                                  choices = elements_all())
+    })
+    
+    observe({
+        
+        if (is.null(sel_elements())) return(NULL)       
+        
+       
+        updateSliderInput(session, "clip_slider",
+                          value = c(min(clip_element()), max(clip_element())),
+                          min = 0,
+                          max = max(clip_element()))
         
     })
     

@@ -26,9 +26,26 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
 
         # Show a plot of the generated distribution
         mainPanel(
-            # if more than 12 elements are selected I should create more plot 
-            # Outputs
-            plotOutput("LaserMap"),
+            tabsetPanel(
+                tabPanel("Clipping Element",
+                         
+                         plotly::plotlyOutput("ClipPlot"),
+                         
+                         sliderInput("clip_slider", "Clip element", 
+                                     value = c(10, 90),
+                                     min = 1,
+                                     max = 100),
+                         
+                         textOutput("SliderText"),
+                         ),
+                
+                tabPanel("Laser Map",
+                    # if more than 12 elements are selected I should create more plot 
+                    # Outputs
+                    plotOutput("LaserMap")
+                    
+                    )
+                )
+            )
         )
-    )
-))
+    ))
