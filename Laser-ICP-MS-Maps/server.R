@@ -21,8 +21,14 @@ shinyServer(function(input, output, session) {
         names(laser_data()[-c(1,2)])
     })
     
+    #TODO Here I have to create a data frame that says if element should be
+    #transformed or not. 
     sel_elements <- reactive({
         input$sel_elements
+    })
+    
+    linear_elements <- reactive({
+        input$linear
     })
     
     clip_element <- reactive({
@@ -84,6 +90,14 @@ shinyServer(function(input, output, session) {
                                  choices = elements_all())
     })
     
+    observe({
+        if (is.null(input$sel_elements)) return(NULL)
+        
+        updateCheckboxGroupInput(session, "linear",
+                                 choiceValues = sel_elements(),
+                                 choiceNames = sel_elements())
+    })
+    
    observe({
        
        if (is.null(input$upload)) return(NULL)
@@ -104,16 +118,37 @@ shinyServer(function(input, output, session) {
         
     })
     
+    observe({
+        if (input$sizemanual == "manual"){
+            output$width0 <- renderUI({numericInput("width", "Plot Width", 
+                                                    value = 10, 
+                                                    min = 5,
+                                                    max = 20)
+                })
+            output$height0 <- renderUI({numericInput("height", "Plot Height",
+                                                     value = 7,
+                                                     min = 5, 
+                                                     max = 20)})
+        }
+        if (input$sizemanual == "auto") {
+            output$width0 <- renderUI({})
+            output$height0 <- renderUI({})
+        }
+    })
+    
 })
 
 # Works pretty well so far!!
-# TODO Downloading looks like shit. Make the height and width a setting to 
-# define in the app so the user can play around with those values until the plot
-# looks good enough.
-# TODO Option for not log transforming the plot. Maybe in a second tab,
-# because otherwise the list will be very long. Or try to split the 
-# sidebar panel in two columns.
-# TODO Make the plot size depending on the number of plots shown, 
+# Next steps!
+# TODO Write backend for the height and width settings!
+# TODO Create hight and width settings for the active plot, or maybe even better
+# find a way to fix the coord_ratio of the plots. I don't know if that is possible.
+# TODO Write backend for the log transformation!
+# TODO Make plot width and height widgets appear next to each other in the Download
+# tab!
+# 
+# Later
+# TODO See second point! Make the plot size depending on the number of plots shown, 
 # this involves a lot a of trying and than writing if statements. OR!!
 # Make buttons that let you increase or decrease the plot size manually
 # 

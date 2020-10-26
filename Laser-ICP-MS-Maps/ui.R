@@ -35,18 +35,35 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                tabPanel("Laser Map",
                         sidebarLayout(
                             sidebarPanel(
-                                radioButtons("color", "Choose a color palette",
-                                             choices = c("magma", "inferno", 
-                                                         "plasma", "viridis", 
-                                                         "cividis"),
-                                             selected = "viridis"
-                                            ),
-                                checkboxGroupInput("sel_elements", "Select elements")
-                            ),
+                                tabsetPanel(
+                                    tabPanel("Elements",
+                                             fluidRow(
+                                                radioButtons("color", "Choose a color palette",
+                                                             choices = c("magma", "inferno", 
+                                                                         "plasma", "viridis", 
+                                                                         "cividis"),
+                                                             selected = "viridis"
+                                                            ),
+                                                column(5,
+                                                       checkboxGroupInput("sel_elements", "Select Elements")),
+                                                column(5, 
+                                                       checkboxGroupInput("linear", "Linear Transform"))
+                                                )
+                                             
+                                             ),
+                                    tabPanel("Download",
+                                             fluidRow(
+                                             radioButtons("sizemanual", "",
+                                                          choices = c("auto", "manual"),
+                                                          selected = "auto"),
+                                             uiOutput("width0"),
+                                             uiOutput("height0"),
+                                             downloadButton("download"))
+                                    )
+                            )),
                             
                             mainPanel(
                                 plotOutput("LaserMap"),
-                                downloadButton("download")
                             )
                         ))
                )
