@@ -13,6 +13,8 @@ library(dplyr)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 
+# Data Loading and Element Selection --------------------------------------
+
     laser_data <- reactive({
         readr::read_csv(input$upload$datapath) 
     })
@@ -31,6 +33,9 @@ shinyServer(function(input, output, session) {
         input$linear
     })
     
+
+# Clip Element ------------------------------------------------------------
+
     clip_element <- reactive({
         input$clipelement
     })
@@ -45,60 +50,12 @@ shinyServer(function(input, output, session) {
             dplyr::filter(!! sym(clip_element()) > input$clip_slider[1] &
                               !! sym(clip_element()) < input$clip_slider[2])
     })
-        
+     
     cliped_plot_data <- eventReactive(input$clip, {
         cliped_data()
     })
-         
-    output$ClipPlot <- plotly::renderPlotly({
-        
-        if (clip_element() == "") return(NULL)
-        
-        geochem::clipping_element(clip_element(),
-                                  cliped_data())
-    }) 
-     
-    output$LaserMap <- renderPlot(height = "auto",{ # 500 seems ok so far
-         
-        if (is.null(input$upload)) return(NULL)
-        if (is.null(sel_elements())) return(NULL)
-        
-        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
-                                            selected_elements = sel_elements(),
-                                            option = input$color)
 
-        ggpubr::ggarrange(plotlist = map_plot_list)
-    })
-    
-    output$download <- downloadHandler(
-        filename = function() {
-            paste0(input$upload, ".png")
-        },
-        
-        content = function(file) {
-            ggplot2::ggsave(file, device = "png", width = 10, height = 15)
-        }
-    )
-    
-    output$SliderText <- renderText({paste(my_range(), sel_elements())})
-    
     observe({
-        
-        if (is.null(input$upload)) return(NULL)
-        
-        updateCheckboxGroupInput(session, "sel_elements",
-                                 choices = elements_all())
-    })
-    
-    observe({
-        if (is.null(input$sel_elements)) return(NULL)
-        
-        updateCheckboxGroupInput(session, "linear",
-                                 choiceValues = sel_elements(),
-                                 choiceNames = sel_elements())
-    })
-    
-   observe({
        
        if (is.null(input$upload)) return(NULL)
        
@@ -117,6 +74,91 @@ shinyServer(function(input, output, session) {
                           max = round(max(clip_values())))
         
     })
+     
+  
+# Columns -----------------------------------------------------------------
+
+    colums_manually <- reactive({
+        input$columsman
+    })
+    
+    n_columns <- reactive({
+        if (colums_manually()) {
+            input$ncol
+        } else {
+            NULL
+        }
+    })
+
+    observe({
+        if (input$columsman) {
+            output$column_slider <- renderUI({sliderInput("ncol", "Columns", 
+                                                          value = 2, 
+                                                          min = 1, 
+                                                          max = length(sel_elements()),
+                                                          step = 1)
+            })
+        } 
+        if (!input$columsman) {
+            output$column_slider <- renderUI({})
+        }
+    })
+
+    
+# Plots -------------------------------------------------------------------
+
+    output$ClipPlot <- plotly::renderPlotly({
+        
+         if (clip_element() == "") return(NULL)
+        
+         geochem::clipping_element(clip_element(),
+                                  cliped_data())
+         }) 
+     
+    output$LaserMap <- renderPlot(height = function() input$height,
+                                  width = function() input$width,{ # 500 seems ok so far
+         
+        if (is.null(input$upload)) return(NULL)
+        if (is.null(sel_elements())) return(NULL)
+        
+        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
+                                            selected_elements = sel_elements(),
+                                            option = input$color)
+
+        cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
+    })
+    
+   
+    output$SliderText <- renderText({paste(my_range(), sel_elements())})
+    
+    observe({
+        
+        if (is.null(input$upload)) return(NULL)
+        
+        updateCheckboxGroupInput(session, "sel_elements",
+                                 choices = elements_all())
+    })
+    
+    observe({
+        if (is.null(input$sel_elements)) return(NULL)
+        
+        updateCheckboxGroupInput(session, "linear",
+                                 choiceValues = sel_elements(),
+                                 choiceNames = sel_elements())
+    })
+    
+    
+ #Download ----------------------------------------------------------------
+
+    output$download <- downloadHandler(
+        filename = function() {
+            paste0(input$upload, ".png")
+        },
+        
+        content = function(file) {
+            ggplot2::ggsave(file, device = "png", width = 10, height = 15)
+        }
+    )
     
     observe({
         if (input$sizemanual == "manual"){
@@ -137,6 +179,9 @@ shinyServer(function(input, output, session) {
     })
     
 })
+
+
+# Notes & TODO ------------------------------------------------------------
 
 # Works pretty well so far!!
 # Next steps!

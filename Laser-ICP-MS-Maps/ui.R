@@ -38,12 +38,18 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                 tabsetPanel(
                                     tabPanel("Elements",
                                              fluidRow(
-                                                radioButtons("color", "Choose a color palette",
+                                                column(5,
+                                                       radioButtons("color", "Choose a color palette",
                                                              choices = c("magma", "inferno", 
                                                                          "plasma", "viridis", 
                                                                          "cividis"),
-                                                             selected = "viridis"
-                                                            ),
+                                                             selected = "viridis")
+                                                       ),
+                                                column(5,
+                                                       checkboxInput("columsman", "cols manually?",
+                                                                     value = FALSE))
+                                                ),
+                                             fluidRow(
                                                 column(5,
                                                        checkboxGroupInput("sel_elements", "Select Elements")),
                                                 column(5, 
@@ -63,7 +69,15 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                             )),
                             
                             mainPanel(
-                                plotOutput("LaserMap"),
+                                fluidRow(
+                                    column(3,
+                                           sliderInput("height", "Height", value = 500, min = 100, max = 5000)),
+                                    column(3,
+                                           sliderInput("width", "Width", value = 500, min = 100, max = 5000)),
+                                    column(3,
+                                           uiOutput("column_slider"))
+                                ),
+                                    plotOutput("LaserMap"),
                             )
                         ))
                )
