@@ -106,7 +106,7 @@ shinyServer(function(input, output, session) {
 
     
 # Plots -------------------------------------------------------------------
-
+    
     output$ClipPlot <- plotly::renderPlotly({
         
          if (clip_element() == "") return(NULL)
@@ -115,8 +115,7 @@ shinyServer(function(input, output, session) {
                                   cliped_data())
          }) 
      
-    output$LaserMap <- renderPlot(height = function() input$height,
-                                  width = function() input$width,{ # 500 seems ok so far
+    laser_map_plot <- reactive({ # 500 seems ok so far
          
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
@@ -126,6 +125,12 @@ shinyServer(function(input, output, session) {
                                             option = input$color)
 
         cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
+    })
+    
+    output$LaserMap <- renderPlot(height = function() input$height,
+                                  width = function() input$width,{
+                                    
+                                    laser_map_plot()
     })
     
    
@@ -150,34 +155,27 @@ shinyServer(function(input, output, session) {
     
  #Download ----------------------------------------------------------------
 
+    plot_width <- reactive({
+      input$width
+    })
+    
+    plot_height <- reactive({
+      input$height
+    })
+    
     output$download <- downloadHandler(
         filename = function() {
             paste0(input$upload, ".png")
         },
         
         content = function(file) {
-            ggplot2::ggsave(file, device = "png", width = 10, height = 15)
+            cowplot::save_plot(file, laser_map_plot(), 
+                               base_height = plot_height()/100,
+                               units = c("in"),
+                               base_asp = plot_width()/plot_height()
+            )
         }
     )
-    
-    observe({
-        if (input$sizemanual == "manual"){
-            output$width0 <- renderUI({numericInput("width", "Plot Width", 
-                                                    value = 10, 
-                                                    min = 5,
-                                                    max = 20)
-                })
-            output$height0 <- renderUI({numericInput("height", "Plot Height",
-                                                     value = 7,
-                                                     min = 5, 
-                                                     max = 20)})
-        }
-        if (input$sizemanual == "auto") {
-            output$width0 <- renderUI({})
-            output$height0 <- renderUI({})
-        }
-    })
-    
 })
 
 
