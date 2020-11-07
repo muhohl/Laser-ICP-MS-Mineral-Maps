@@ -104,6 +104,15 @@ shinyServer(function(input, output, session) {
         }
     })
 
+
+# Linear Transformation ---------------------------------------------------
+
+    Log_Trans_Df <- reactive({
+        tibble(Elements = sel_elements(),
+               Log_Trans = "log") %>% 
+          mutate(Log_Trans = if_else(sel_elements() %in% input$linear,
+                                     "identity", "log"))
+    })  
     
 # Plots -------------------------------------------------------------------
     
@@ -122,6 +131,7 @@ shinyServer(function(input, output, session) {
         
         map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
                                             selected_elements = sel_elements(),
+                                            Log_Trans = Log_Trans_Df(),
                                             option = input$color)
 
         cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())

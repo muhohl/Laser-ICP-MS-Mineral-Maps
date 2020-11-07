@@ -58,13 +58,7 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                              
                                              ),
                                     tabPanel("Download",
-                                             fluidRow(
-                                             radioButtons("sizemanual", "",
-                                                          choices = c("auto", "manual"),
-                                                          selected = "auto"),
-                                             uiOutput("width0"),
-                                             uiOutput("height0"),
-                                             downloadButton("download"))
+                                             fluidRow(downloadButton("download"))
                                     )
                             )),
                             
