@@ -10,6 +10,8 @@
 library(shiny)
 library(dplyr)
 
+options(shiny.maxRequestSize=30*1024^2)
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 
