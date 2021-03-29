@@ -18,11 +18,15 @@ shinyServer(function(input, output, session) {
 # Data Loading and Element Selection --------------------------------------
 
     laser_data <- reactive({
-        readr::read_csv(input$upload$datapath) 
+        readr::read_csv(input$upload$datapath) %>% 
+        dplyr::rename_with(tolower, c("X", "Y"))
     })
     
     elements_all <- reactive({
-        names(laser_data()[-c(1,2)])
+        laser_data() %>% 
+            dplyr::select(!x) %>% 
+            dplyr::select(!y) %>% 
+            names()
     })
     
     #TODO Here I have to create a data frame that says if element should be
@@ -131,10 +135,13 @@ shinyServer(function(input, output, session) {
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
         
-        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
+        map_plot_list <- geochem::laser_map(data = cliped_data(),
                                             selected_elements = sel_elements(),
                                             Log_Trans = Log_Trans_Df(),
-                                            option = input$color)
+                                            option = input$color,
+                                            unit_title = input$unit_title,
+                                            font = input$font,
+                                            fontsize = input$fontsize)
 
         cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
     })

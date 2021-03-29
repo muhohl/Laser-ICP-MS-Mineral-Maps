@@ -39,7 +39,7 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                     tabPanel("Elements",
                                              fluidRow(
                                                 column(5,
-                                                       radioButtons("color", "Choose a color palette",
+                                                       radioButtons("color", "Choose a color palette!",
                                                              choices = c("magma", "inferno", 
                                                                          "plasma", "viridis", 
                                                                          "cividis"),
@@ -47,7 +47,15 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                        ),
                                                 column(5,
                                                        checkboxInput("columsman", "cols manually?",
-                                                                     value = FALSE))
+                                                                     value = FALSE)
+                                                       ),
+                                                column(5, 
+                                                       selectInput("unit_title", "Choose a unit!",
+                                                                   choices = c("[ppm]", "[wt.%]", " "))
+                                                       ),
+                                                column(5,
+                                                       selectInput("font", "Choose a font!",
+                                                                   choices = c("serif", "sans", "mono")))
                                                 ),
                                              fluidRow(
                                                 column(5,
@@ -68,6 +76,8 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                            sliderInput("height", "Height", value = 500, min = 100, max = 5000)),
                                     column(3,
                                            sliderInput("width", "Width", value = 500, min = 100, max = 5000)),
+                                    column(3,
+                                           sliderInput("fontsize", "Font Size", value = 14, min = 6, max = 30)),
                                     column(3,
                                            uiOutput("column_slider"))
                                 ),
