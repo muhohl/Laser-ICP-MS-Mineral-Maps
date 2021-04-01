@@ -19,7 +19,7 @@ shinyServer(function(input, output, session) {
 
     laser_data <- reactive({
         readr::read_csv(input$upload$datapath) %>% 
-        dplyr::rename_with(tolower, c("X", "Y"))
+        plyr::rename(replace = c(X="x", Y="y"), warn_missing = FALSE)
     })
     
     elements_all <- reactive({
