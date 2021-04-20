@@ -45,18 +45,24 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                                          "cividis"),
                                                              selected = "viridis")
                                                        ),
-                                                column(5,
-                                                       checkboxInput("columsman", "cols manually?",
-                                                                     value = FALSE)
-                                                       ),
                                                 column(5, 
                                                        selectInput("unit_title", "Choose a unit!",
                                                                    choices = c("[ppm]", "[wt.%]", " "))
                                                        ),
                                                 column(5,
                                                        selectInput("font", "Choose a font!",
-                                                                   choices = c("serif", "sans", "mono")))
+                                                                   choices = c("serif", "sans", "mono"))
+                                                       )
                                                 ),
+                                             fluidRow(
+                                                 column(5,
+                                                        checkboxInput("columsman", "cols manually?",
+                                                                      value = FALSE)
+                                                        ),
+                                                 column(5,
+                                                        selectInput("labels", "Choose a scale notation!",
+                                                                    choices = c("number", "scientific", "number_si")))
+                                             ),
                                              fluidRow(
                                                 column(5,
                                                        checkboxGroupInput("sel_elements", "Select Elements")),

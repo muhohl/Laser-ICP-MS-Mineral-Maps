@@ -39,6 +39,18 @@ shinyServer(function(input, output, session) {
         input$linear
     })
     
+    sel_labels <- reactive({
+      if (input$labels == "number") {
+        return(scales::label_number())
+      } 
+      if (input$labels == "scientific") {
+        return(scales::label_scientific())
+      }
+      if (input$labels == "number_si") {
+        return(scales:::label_number_si())
+      }
+    })
+    
 
 # Clip Element ------------------------------------------------------------
 
@@ -141,7 +153,8 @@ shinyServer(function(input, output, session) {
                                             option = input$color,
                                             unit_title = input$unit_title,
                                             font = input$font,
-                                            fontsize = input$fontsize)
+                                            fontsize = input$fontsize,
+                                            labels = sel_labels())
 
         cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
     })
