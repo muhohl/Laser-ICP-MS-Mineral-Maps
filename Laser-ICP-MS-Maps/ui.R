@@ -19,9 +19,10 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                 # Uploat data set
                                 fileInput("upload",
                                           "Laser Data"),
-                                selectInput("clipelement", "Choose element to clip", 
+                                selectInput("clipelement", "Choose element to clip!", 
                                             choices = ""),
                                 actionButton("clip", "Clip your data!"),
+                                checkboxInput("keepdata", "Keep the clipped data set!")
                             ),
                             
                             mainPanel(

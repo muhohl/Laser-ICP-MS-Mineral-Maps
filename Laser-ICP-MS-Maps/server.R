@@ -17,10 +17,14 @@ shinyServer(function(input, output, session) {
 
 # Data Loading and Element Selection --------------------------------------
 
-    laser_data <- reactive({
-        readr::read_csv(input$upload$datapath) %>% 
-        plyr::rename(replace = c(X="x", Y="y"), warn_missing = FALSE)
+    laser_data <- reactiveVal()
+    
+    observe({
+      req(input$upload$datapath)
+      laser_data(readr::read_csv(input$upload$datapath) %>% 
+                   plyr::rename(replace = c(X="x", Y="y"), warn_missing = FALSE))
     })
+
     
     elements_all <- reactive({
         laser_data() %>% 
@@ -62,16 +66,32 @@ shinyServer(function(input, output, session) {
         laser_data() %>% 
         dplyr::pull(clip_element())
     })
-     
+   
+    keep_data <- reactive({
+        input$keepdata
+    })
+       
     cliped_data <- reactive({
-        laser_data() %>% 
-            dplyr::filter(!! sym(clip_element()) > input$clip_slider[1] &
-                              !! sym(clip_element()) < input$clip_slider[2])
+      laser_data() %>% 
+        dplyr::filter(!! sym(clip_element()) > input$clip_slider[1] &
+                      !! sym(clip_element()) < input$clip_slider[2])
     })
      
     cliped_plot_data <- eventReactive(input$clip, {
         cliped_data()
     })
+   
+    
+    observeEvent(input$keepdata, {
+      tmp <- cliped_plot_data()
+      laser_data(tmp)
+    })
+    
+    #cliped_data_updater <- reactive({
+    #  if (keep_data()) {
+    #    laser_data <- cliped_data()
+    #  }
+    #})
 
     observe({
        
@@ -85,7 +105,6 @@ shinyServer(function(input, output, session) {
         
         if (clip_element() == "") return(NULL)       
         
-       
         updateSliderInput(session, "clip_slider",
                           value = c(0, round(max(clip_values()))),
                           min = 0,
@@ -147,7 +166,7 @@ shinyServer(function(input, output, session) {
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
         
-        map_plot_list <- geochem::laser_map(data = cliped_data(),
+        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
                                             selected_elements = sel_elements(),
                                             Log_Trans = Log_Trans_Df(),
                                             option = input$color,
