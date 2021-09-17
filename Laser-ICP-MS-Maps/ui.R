@@ -31,7 +31,8 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                 sliderInput("clip_slider", "Clip element", 
                                             value = c(10, 90),
                                             min = 1,
-                                            max = 100)
+                                            max = 100,
+                                            step = 0.1)
                         ))),
                tabPanel("Laser Map",
                         sidebarLayout(
