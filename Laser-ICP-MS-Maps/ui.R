@@ -44,8 +44,9 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                        radioButtons("color", "Choose a color palette!",
                                                              choices = c("magma", "inferno", 
                                                                          "plasma", "viridis", 
-                                                                         "cividis"),
-                                                             selected = "viridis")
+                                                                         "cividis", "rocket",
+                                                                         "mako", "turbo"),
+                                                             selected = "turbo")
                                                        ),
                                                 column(5, 
                                                        selectInput("unit_title", "Choose a unit!",
@@ -80,6 +81,8 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                             
                             mainPanel(
                                 fluidRow(
+                                    column(3,
+                                           sliderInput("barsize", "Bar Size", value = 7, min = 1, max = 15)),
                                     column(3,
                                            sliderInput("height", "Height", value = 500, min = 100, max = 5000)),
                                     column(3,

@@ -165,15 +165,33 @@ shinyServer(function(input, output, session) {
          
         if (is.null(input$upload)) return(NULL)
         if (is.null(sel_elements())) return(NULL)
-        
-        map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
-                                            selected_elements = sel_elements(),
-                                            Log_Trans = Log_Trans_Df(),
-                                            option = input$color,
-                                            unit_title = input$unit_title,
-                                            font = input$font,
-                                            fontsize = input$fontsize,
-                                            labels = sel_labels())
+
+        map_plot_list <- geochem::laser_map2(data = cliped_plot_data(),
+                                             columns = which(names(cliped_plot_data()) %in% input$sel_elements),
+                                             unit = input$unit_title,
+                                             option = input$color,
+                                             labels = sel_labels(),
+                                             family = input$font)
+        #map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
+        #                                    selected_elements = sel_elements(),
+        #                                    Log_Trans = Log_Trans_Df(),
+        #                                    option = input$color,
+        #                                    unit_title = input$unit_title,
+        #                                    font = input$font,
+        #                                    fontsize = input$fontsize,
+        #                                    labels = sel_labels())
+
+        # Setup a plot for the linear maps
+        for (i in which(input$sel_elements %in% input$linear)) {
+            map_plot_list[[i]] <- geochem::laser_map2(data = cliped_plot_data(),
+                                                      columns = which(names(cliped_plot_data()) %in% input$sel_elements[i]),
+                                                      trans = "identity",
+                                                      option = input$color,
+                                                      family = input$font)[[1]]
+        }
+
+        # TODO Write for Loop that changes the color bar height and width
+        # And change the labels as according to the linear or log transformation probably offer different color scale option
 
         cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
     })
@@ -234,12 +252,9 @@ shinyServer(function(input, output, session) {
 
 # Works pretty well so far!!
 # Next steps!
-# TODO Write backend for the height and width settings!
-# TODO Create hight and width settings for the active plot, or maybe even better
-# find a way to fix the coord_ratio of the plots. I don't know if that is possible.
-# TODO Write backend for the log transformation!
 # TODO Make plot width and height widgets appear next to each other in the Download
 # tab!
+# TODO Add ratio plot and maybe a PCA algorithm in the background
 # 
 # Later
 # TODO See second point! Make the plot size depending on the number of plots shown, 
