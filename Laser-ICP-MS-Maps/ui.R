@@ -55,7 +55,10 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                 column(5,
                                                        selectInput("font", "Choose a font!",
                                                                    choices = c("serif", "sans", "mono"))
-                                                       )
+                                                       ),
+                                                column(5,
+                                                       selectInput("label", "Choose a starting label!",
+                                                                   choices = c(NA, LETTERS), selected = "B"))
                                                 ),
                                              fluidRow(
                                                  column(5,
@@ -74,8 +77,27 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                 )
                                              
                                              ),
+                                    tabPanel("Ratio Plots",
+                                             fluidRow(
+                                                 column(5,
+                                                        selectInput("denominator", "Denominator",
+                                                                    choices = "")),
+                                                 column(5,
+                                                        actionButton("ratio", "Add Ratio!"))
+                                                 ),
+                                             fluidRow(
+                                                 column(5,
+                                                        selectInput("enumerator", "Enumerator",
+                                                                    choices = ""))
+                                                 ),
+                                             fluidRow(
+                                                 column(5,
+                                                        checkboxGroupInput("sel_elements", "Select Elements"))
+                                                 )
+                                             ),
                                     tabPanel("Download",
                                              fluidRow(downloadButton("download"))
+
                                     )
                             )),
                             

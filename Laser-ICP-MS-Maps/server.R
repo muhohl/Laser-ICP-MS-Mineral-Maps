@@ -170,6 +170,7 @@ shinyServer(function(input, output, session) {
                                              columns = which(names(cliped_plot_data()) %in% input$sel_elements),
                                              unit = input$unit_title,
                                              option = input$color,
+                                             plot_label_start = input$label,
                                              labels = sel_labels(),
                                              family = input$font)
         #map_plot_list <- geochem::laser_map(data = cliped_plot_data(),
@@ -183,17 +184,37 @@ shinyServer(function(input, output, session) {
 
         # Setup a plot for the linear maps
         for (i in which(input$sel_elements %in% input$linear)) {
+            if (input$label != "NA") {
+                # Make sure to use the right letters
+                letter <- LETTERS[i+which(LETTERS %in% input$label)-1]
+            } else {
+                letter <- "NA"
+            }
             map_plot_list[[i]] <- geochem::laser_map2(data = cliped_plot_data(),
                                                       columns = which(names(cliped_plot_data()) %in% input$sel_elements[i]),
+                                                      unit = input$unit_title,
                                                       trans = "identity",
                                                       option = input$color,
-                                                      family = input$font)[[1]]
+                                                      plot_label_start = letter,
+                                                      family = input$font,
+                                                      labels = scales::label_number(),
+                                                      breaks = scales::extended_breaks())[[1]]
         }
 
         # TODO Write for Loop that changes the color bar height and width
         # And change the labels as according to the linear or log transformation probably offer different color scale option
 
-        cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns())
+        for (i in seq_along(map_plot_list)) {
+            map_plot_list[[i]] <- map_plot_list[[i]] +
+               ggplot2::guides(fill = ggplot2::guide_colorbar(barheight = input$barsize,
+                                                     barwidth = input$barsize/13,
+                                                     ticks.colour = "black",
+                                                     frame.colour = "black")) +
+               ggplot2::theme(title = ggplot2::element_text(size = input$fontsize),
+                              legend.text = ggplot2::element_text(size = input$fontsize))
+        }
+
+        cowplot::plot_grid(plotlist = map_plot_list, ncol = n_columns(), align = c("v", "h"))
     })
     
     output$LaserMap <- renderPlot(height = function() input$height,
@@ -220,9 +241,36 @@ shinyServer(function(input, output, session) {
                                  choiceValues = sel_elements(),
                                  choiceNames = sel_elements())
     })
+
+ # Ratio Plots ------------------------------------------------------------
+
+    observe({
+        if (is.null(input$upload)) return(NULL)
+
+        updateSelectInput(session, "denominator",
+                          choices = elements_all())
+
+    })
+
+    observe({
+        if (is.null(input$upload)) return(NULL)
+
+        updateSelectInput(session, "enumerator",
+                          choices = elements_all())
+
+    })
+
+
+    observe({
+        if (is.null(input$upload)) return(NULL)
+
+        updateCheckboxGroupInput(session, "selected_elements",
+                                 choiceValues = sel_elements(),
+                                 choiceNames = sel_elements())
+
+    })
     
-    
- #Download ----------------------------------------------------------------
+ # Download ---------------------------------------------------------------
 
     plot_width <- reactive({
       input$width
