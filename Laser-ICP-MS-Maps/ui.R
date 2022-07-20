@@ -92,7 +92,7 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                  ),
                                              fluidRow(
                                                  column(5,
-                                                        checkboxGroupInput("sel_elements", "Select Elements"))
+                                                        checkboxGroupInput("sel_elements_ratio", "Select Elements"))
                                                  )
                                              ),
                                     tabPanel("Download",
