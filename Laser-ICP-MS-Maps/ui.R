@@ -12,7 +12,7 @@ library(shiny)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
 
-    navbarPage("Laser Icp-Ms Maps",
+    navbarPage("Laser-ICPMS Maps",
                tabPanel("Clipping Element",
                         sidebarLayout(
                             sidebarPanel(
@@ -77,24 +77,24 @@ shinyUI(fluidPage(theme = shinythemes::shinytheme("flatly"),
                                                 )
                                              
                                              ),
-                                    tabPanel("Ratio Plots",
-                                             fluidRow(
-                                                 column(5,
-                                                        selectInput("denominator", "Denominator",
-                                                                    choices = "")),
-                                                 column(5,
-                                                        actionButton("ratio", "Add Ratio!"))
-                                                 ),
-                                             fluidRow(
-                                                 column(5,
-                                                        selectInput("enumerator", "Enumerator",
-                                                                    choices = ""))
-                                                 ),
-                                             fluidRow(
-                                                 column(5,
-                                                        checkboxGroupInput("sel_elements_ratio", "Select Elements"))
-                                                 )
-                                             ),
+                                    #tabPanel("Ratio Plots",
+                                    #         fluidRow(
+                                    #             column(5,
+                                    #                    selectInput("denominator", "Denominator",
+                                    #                                choices = "")),
+                                    #             column(5,
+                                    #                    actionButton("ratio", "Add Ratio!"))
+                                    #             ),
+                                    #         fluidRow(
+                                    #             column(5,
+                                    #                    selectInput("enumerator", "Enumerator",
+                                    #                                choices = ""))
+                                    #             ),
+                                    #         fluidRow(
+                                    #             column(5,
+                                    #                    checkboxGroupInput("sel_elements_ratio", "Select Elements"))
+                                    #             )
+                                    #         ),
                                     tabPanel("Download",
                                              fluidRow(downloadButton("download"))
 

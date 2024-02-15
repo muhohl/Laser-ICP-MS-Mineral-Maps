@@ -9,6 +9,7 @@
 
 library(shiny)
 library(dplyr)
+library(geochem)
 
 options(shiny.maxRequestSize=30*1024^2)
 
@@ -243,58 +244,58 @@ shinyServer(function(input, output, session) {
     })
 
  # Ratio Plots ------------------------------------------------------------
- # So far I can't the append the newly created ration columns to the main data frame
+ # So far I can't the append the newly created ratio columns to the main data frame
  # Look in Laser_Mapping_R/app.R for possible solution, in which I manage to add columns to the
  # exisiting data frame with reactiveValues() and the dataframe as function argument summarized
- # Need to understand what the function reactiveValues() does!!
-
-    observe({
-        if (is.null(input$upload)) return(NULL)
-
-        updateSelectInput(session, "denominator",
-                          choices = elements_all())
-
-    })
-
-    observe({
-        if (is.null(input$upload)) return(NULL)
-
-        updateSelectInput(session, "enumerator",
-                          choices = elements_all())
-
-    })
-
-
-    observe({
-        if (is.null(input$upload)) return(NULL)
-
-        updateCheckboxGroupInput(session, "selected_elements_ratio",
-                                 choiceValues = sel_elements(),
-                                 choiceNames = sel_elements())
-
-    })
-
-    ratio_den <- reactive({
-        input$denominator
-    })
-    ratio_enu <- reactive({
-        input$enumerator
-    })
-
-    plus_it <- eventReactive(input$plus{
-
-    })
-
-    ratio_data <- reactive({
-        if (is.null(input$upload)) return(NULL)
-
-        cliped_plot_data() %>%
-            #mutate(paste0(!! sym(ratio_enu()), "/", !! sym(ratio_enu())) := !! sym(ratio_den()) / !! sym(ratio_enu()) %>%
-            mutate(paste0(!! sym(ratio_enu()), "/", !! sym(ratio_enu())) := Ti49/V51) %>%
-            select(tail(names(.),1))
-    })
-
-    #cliped_plot_data <- eventReactive(input$ratio, {
+ ## Need to understand what the function reactiveValues() does!!
+#
+ #   observe({
+ #       if (is.null(input$upload)) return(NULL)
+#
+ #       updateSelectInput(session, "denominator",
+ #                         choices = elements_all())
+#
+ #   })
+#
+ #   observe({
+ #       if (is.null(input$upload)) return(NULL)
+#
+ #       updateSelectInput(session, "enumerator",
+ #                         choices = elements_all())
+#
+ #   })
+#
+#
+ #   observe({
+ #       if (is.null(input$upload)) return(NULL)
+#
+ #       updateCheckboxGroupInput(session, "selected_elements_ratio",
+ #                                choiceValues = sel_elements(),
+ #                                choiceNames = sel_elements())
+#
+ #   })
+#
+ #   ratio_den <- reactive({
+ #       input$denominator
+ #   })
+ #   ratio_enu <- reactive({
+ #       input$enumerator
+ #   })
+#
+ #   plus_it <- eventReactive(input$plus{
+#
+ #   })
+#
+ #   ratio_data <- reactive({
+ #       if (is.null(input$upload)) return(NULL)
+#
+ #       cliped_plot_data() %>%
+ #           #mutate(paste0(!! sym(ratio_enu()), "/", !! sym(ratio_enu())) := !! sym(ratio_den()) / !! sym(ratio_enu()) %>%
+ #           mutate(paste0(!! sym(ratio_enu()), "/", !! sym(ratio_enu())) := Ti49/V51) %>%
+ #           select(tail(names(.),1))
+ #   })
+#
+ #   #cliped_plot_data <- eventReactive(input$ratio, {
     #    bind_cols(cliped_plot_data(), ratio_data())
     #})
  # Download ---------------------------------------------------------------
